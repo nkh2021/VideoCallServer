@@ -2,8 +2,8 @@ const http = require("http");
 const express = require("express");
 const cors = require("cors");
 const app = express();
-const server = http.createServer(app).listen(3000, () => {
-  console.log("Server is running on port 3000");
+const server = http.createServer(app).listen(4500, () => {
+  console.log("Server is running on port 4500");
 });
 const io = require("socket.io")(server);
 
