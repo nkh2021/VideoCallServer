@@ -27,6 +27,13 @@ io.on("connection", (socket) => {
   //socket must other users
   const otherUser = connectedUsers.filter((socketId) => socketId !== socket.id);
 
+  //Sending active room list
+  socket.on("getRoomList", () => {
+    var list = [123, 345, 456, 678];
+    console.log("room list :" + list);
+    socket.emit("roomList", list);
+  });
+
   //emit an event to myself for other user
   socket.emit("otherUser", otherUser);
 
