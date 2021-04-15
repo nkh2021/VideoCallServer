@@ -3,29 +3,17 @@ const express = require("express");
 const cors = require("cors");
 const app = express();
 const ServerPort = process.env.PORT || 3000;
-const server = http.createServer(app).listen(ServerPort, "192.168.1.2", () => {
+const server = http.createServer(app).listen(ServerPort, () => {
   console.log(`Server is running on port ${ServerPort}`);
 });
 const io = require("socket.io")(server);
 
 app.use(cors());
-// app.listen(3000, () => {
-//   console.log("Server is running on port 3000");
-// });
 
-let connectedUsers = [];
-let userCount = 0;
 //Socket on conneciton
 io.on("connection", (socket) => {
   // console.log(sockets);
   console.log("New connection : " + socket.id);
-
-  // //Socket must knows all connected usres
-  // connectedUsers.push(socket.id);
-  // console.log("Connection length : " + connectedUsers.length);
-
-  // //socket must other users
-  // const otherUser = connectedUsers.filter((socketId) => socketId !== socket.id);
 
   //Sending active room list
   socket.on("getRoomList", () => {
@@ -34,12 +22,15 @@ io.on("connection", (socket) => {
     socket.emit("roomList", list);
   });
 
+  //When a user click join
   socket.on("join", (roomId) => {
     console.log(
       `${socket.id} join event is raised on roomId ${roomId} ...........`
     );
 
-    userCount = connectedUsers.filter((user) => user.room == roomId);
+    var rooms = io.sockets.adapter.rooms;
+    console.log(rooms);
+
     console.log(
       `userCount of ${connectedUsers.length} is : ${userCount.length}`
     );
@@ -59,20 +50,7 @@ io.on("connection", (socket) => {
     }
   });
 
-  socket.on("disjoin", (roomId) => {
-    var user = connectedUsers.filter(
-      (user) => user.room == roomId && user.username == socket.id
-    );
-    if (user) {
-      socket.leave(roomId);
-      io.sockets
-        .in(roomId)
-        .emit("leaved", { username: user.username, room: user.room });
-    }
-  });
-
-  // //emit an event to myself for other user
-  // socket.emit("otherUser", otherUser);
+  socket.on("disjoin", (roomId) => {});
 
   //Sending offer to start connection
   socket.on("offer", (socketId, description) => {
@@ -95,8 +73,5 @@ io.on("connection", (socket) => {
   //Removing user when socket is disconnected.
   socket.on("disconnect", () => {
     console.log("Disconnect : " + socket.id);
-    connectedUsers = connectedUsers.filter(
-      (socketId) => socketId !== socket.id
-    );
   });
 });
